@@ -74,12 +74,30 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            pkill -f 'audit.*\.jar' || true
-            sleep 2
-            set -a && source /home/${{ secrets.EC2_USERNAME }}/app/.env && set +a
-            mkdir -p /home/${{ secrets.EC2_USERNAME }}/app/logs
-            JAR_FILE=$(ls /home/${{ secrets.EC2_USERNAME }}/app/*.jar | head -n 1)
+            APP_DIR="/home/${{ secrets.EC2_USERNAME }}/app"
+            PID_FILE="$APP_DIR/app.pid"
+
+            # 기존 프로세스 종료 (PID 파일로 정확히 종료)
+            if [ -f "$PID_FILE" ]; then
+              OLD_PID=$(cat "$PID_FILE")
+              if kill -0 "$OLD_PID" 2>/dev/null; then
+                kill "$OLD_PID"
+                sleep 3
+              fi
+              rm -f "$PID_FILE"
+            fi
+
+            # .env 로드
+            set -a && source "$APP_DIR/.env" && set +a
+
+            # 로그 디렉토리 생성
+            mkdir -p "$APP_DIR/logs"
+
+            # JAR 실행 및 PID 저장
+            JAR_FILE=$(ls "$APP_DIR"/*.jar | head -n 1)
             nohup java -jar "$JAR_FILE" \
               --spring.profiles.active=prod \
-              > /home/${{ secrets.EC2_USERNAME }}/app/logs/app.log 2>&1 &
-            echo "Application started successfully"
+              > "$APP_DIR/logs/app.log" 2>&1 &
+            echo $! > "$PID_FILE"
+            disown
+            echo "Application started successfully (PID: $(cat $PID_FILE))"
