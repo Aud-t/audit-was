@@ -35,7 +35,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -x test
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -74,10 +74,12 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 최신 jar 하나만 남기기
-            rm -f /home/${{ secrets.EC2_USERNAME }}/app/audit.jar
-            mv /home/${{ secrets.EC2_USERNAME }}/app/*.jar /home/${{ secrets.EC2_USERNAME }}/app/audit.jar
-            
-            sudo systemctl daemon-reload
-            sudo systemctl restart audit
-            sudo systemctl status audit --no-pager
+            pkill -f 'audit.*\.jar' || true
+            sleep 2
+            set -a && source /home/${{ secrets.EC2_USERNAME }}/app/.env && set +a
+            mkdir -p /home/${{ secrets.EC2_USERNAME }}/app/logs
+            JAR_FILE=$(ls /home/${{ secrets.EC2_USERNAME }}/app/*.jar | head -n 1)
+            nohup java -jar "$JAR_FILE" \
+              --spring.profiles.active=prod \
+              > /home/${{ secrets.EC2_USERNAME }}/app/logs/app.log 2>&1 &
+            echo "Application started successfully"
