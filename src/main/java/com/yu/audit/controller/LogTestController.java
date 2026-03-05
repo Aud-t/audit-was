@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 public class LogTestController {
 
-    @GetMapping("/error")
-    public String errorTest() {
-        throw new RuntimeException("Slack ERROR 테스트입니다.");
-    }
+	@GetMapping("/error")
+	public String errorTest() {
+		throw new RuntimeException("Slack ERROR 테스트입니다.");
+	}
 }
