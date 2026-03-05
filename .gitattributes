@@ -1,3 +1,16 @@
+# 1. 모든 텍스트 파일의 기본값을 LF로 설정
+* text=auto eol=lf
+
+# 2. 실행 권한이 필요한 스크립트 명시
+# (gradlew는 리눅스/맥용이므로 LF여야 함)
 /gradlew text eol=lf
+*.sh text eol=lf
+
+# 3. 윈도우 전용 실행 파일은 CRLF 유지
 *.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 4. 바이너리 파일(이미지, 자바 라이브러리 등)은 변환 제외
 *.jar binary
+*.png binary
+*.jpg binary
