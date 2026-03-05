@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Spring Boot 기본 컬러 로그 설정 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!-- Slack Webhook -->
+    <springProperty name="SLACK_WEBHOOK_URI"
+                    source="logging.slack.webhook-url"
+                    defaultValue="https://hooks.slack.com/services/none"/>
+
+    <!-- Slack Appender -->
+    <appender name="SLACK" class="com.github.maricn.logback.SlackAppender">
+        <webhookUri>${SLACK_WEBHOOK_URI}</webhookUri>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                *[ERROR 발생]* %n
+                🕐 시간: %d{yyyy-MM-dd HH:mm:ss}%n
+                📌 위치: %logger{36}%n
+                💬 메시지: %msg%n
+                🔍 스택트레이스: %ex{5}
+            </pattern>
+        </layout>
+
+        <username>Audit-was</username>
+        <iconEmoji>:rotating_light:</iconEmoji>
+        <colorCoding>true</colorCoding>
+    </appender>
+
+    <!-- Async Slack -->
+    <appender name="ASYNC_SLACK" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK"/>
+        <queueSize>512</queueSize>
+        <neverBlock>false</neverBlock>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 기본 root (Spring Boot 초기화용) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- local / dev 환경 -->
+    <springProfile name="local,dev">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- prod 환경 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_SLACK"/>
+        </root>
+    </springProfile>
+
+</configuration>
