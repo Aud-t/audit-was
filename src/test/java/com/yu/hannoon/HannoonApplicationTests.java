@@ -1,10 +1,10 @@
-package com.yu.audit;
+package com.yu.hannoon;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AuditApplicationTests {
+class HannoonApplicationTests {
 
 	@Test
 	void contextLoads() {

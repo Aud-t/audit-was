@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.yu'
 version = '0.0.1-SNAPSHOT'
-description = 'audit'
+description = 'hannoon'
 
 java {
 	toolchain {

@@ -1,4 +1,4 @@
-package com.yu.audit.config;
+package com.yu.hannoon.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

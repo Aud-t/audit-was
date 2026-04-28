@@ -1,13 +1,13 @@
-package com.yu.audit;
+package com.yu.hannoon;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AuditApplication {
+public class HannoonApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AuditApplication.class, args);
+		SpringApplication.run(HannoonApplication.class, args);
 	}
 
 }
